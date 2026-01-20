@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Партия «Пески Даларра»",
+    "image": "assets/dalarr.png",
+    "price": 700,
+    "type": "партия"
+  },
+  {
+    "title": "Партия «Проклятье Страдда»",
+    "image": "assets/strad.png",
+    "price": 700,
+    "type": "партия"
+  },
+  {
+    "title": "Партия «Бесконечная Библиотека»",
+    "image": "assets/library.png",
+    "price": 700,
+    "type": "партия"
+  },
+  {
+    "title": "Партия «За хладным горизонтом»",
+    "image": "assets/horizon.png",
+    "price": 700,
+    "type": "партия"
+  },
+  {
+    "title": "Ваншот «Последнее путешествие Донды»",
+    "image": "assets/plague.png",
+    "price": 900,
+    "type": "ваншот"
+  },
+  {
+    "title": "Ваншот «Плетение»",
+    "image": "assets/library.png",
+    "price": 900,
+    "type": "ваншот"
+  },
+  {
+    "title": "Ваншот «Чумной лес»",
+    "image": "assets/plague.png",
+    "price": 900,
+    "type": "ваншот"
+  }
+]

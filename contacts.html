@@ -1,0 +1,59 @@
+<!doctype html><html lang="ru"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;650;800;900;1000&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<title>Контакты — RoleHub</title></head>
+<body class="bg-grid">
+
+<div class="header">
+  <div class="nav">
+    <a class="brand" href="index.html">
+      <span class="mark"></span>
+      <span class="name">RoleHub</span>
+      <span class="tag">онлайн НРИ</span>
+    </a>
+    <div class="navlinks">
+      <a href="games.html">Игры</a>
+      <a href="custom.html">Своя партия</a>
+      <a href="contacts.html">Контакты</a>
+      <a href="legal.html">Соглашение</a>
+      <a href="privacy.html">Данные</a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="shape cyan"></div>
+
+  <div class="section-title">
+    <h2>Контакты</h2>
+    <div class="hint">ответим в Telegram</div>
+  </div>
+
+  <div class="panel">
+    <div class="p-inner">
+      <div class="notice">Пиши напрямую: <a data-tg-link href="#">@iwwitich</a></div>
+
+      <h3 style="margin-top:18px; text-transform:uppercase; letter-spacing:.06em">Обратная связь</h3>
+
+      <form id="contactForm" class="form">
+        <div class="field"><label>Имя</label><input name="name" required></div>
+        <div class="field"><label>Контакт</label><input name="contact" required placeholder="@telegram или email"></div>
+        <div class="field"><label>Сообщение</label><textarea name="message" placeholder="Вопрос, предложение, партнёрство…"></textarea></div>
+        <div class="actions">
+          <button class="btn btn-red" type="submit">Отправить</button>
+          <a class="btn btn-outline" href="index.html">На главную</a>
+        </div>
+        <div id="contactForm_status" class="small" style="margin-top:10px"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer>Платформа предоставляет информационные услуги. Оплата и проведение игр осуществляется напрямую между мастером и игроками. Администрация не является стороной сделки.</footer>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body></html>
