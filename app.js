@@ -4,6 +4,8 @@
 // const SUBMIT_API_URL = "...";
 // const TG_USERNAME = "...";
 
+
+const ROLEHUB_STATUS = (window.__ROLEHUB_STATUS = window.__ROLEHUB_STATUS || { gamesError:"", mastersError:"", gamesSource:"", mastersSource:"" });
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
 function esc(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' }[c])); }
@@ -16,24 +18,66 @@ function normalizeImageUrl(raw){
   return u;
 }
 
+function detectDelimiterFromHeaderLine(line){
+  // Pick the delimiter that appears most in the first non-empty line.
+  const counts = {
+    ",": (line.split(",").length - 1),
+    ";": (line.split(";").length - 1),
+    "\t": (line.split("\t").length - 1),
+    "|": (line.split("|").length - 1),
+  };
+  let best = ",";
+  for(const d of [";", "\t", "|"]){
+    if(counts[d] > counts[best]) best = d;
+  }
+  return best;
+}
+
 function parseCSV(text){
+  // Robust CSV parser with auto-delimiter (comma/semicolon/tab/pipe) + quotes.
+  const clean = String(text || "").replace(/^\uFEFF/, "");
+  const firstLine = (clean.split(/\r?\n/).find(l => l.trim().length) || "");
+  const delim = detectDelimiterFromHeaderLine(firstLine);
+
   const rows = [];
-  let cur = [], field = "", inQuotes = false;
-  for(let i=0;i<text.length;i++){
-    const c = text[i];
+  let cur = [];
+  let field = "";
+  let inQuotes = false;
+
+  for(let i=0; i<clean.length; i++){
+    const c = clean[i];
+
     if(inQuotes){
-      if(c === '"' && text[i+1] === '"'){ field += '"'; i++; }
-      else if(c === '"'){ inQuotes = false; }
-      else field += c;
+      if(c === '"' && clean[i+1] === '"'){
+        field += '"';
+        i++;
+      } else if(c === '"'){
+        inQuotes = false;
+      } else {
+        field += c;
+      }
     } else {
-      if(c === '"') inQuotes = true;
-      else if(c === ","){ cur.push(field.trim()); field=""; }
-      else if(c === "\n"){ cur.push(field.trim()); rows.push(cur); cur=[]; field=""; }
-      else if(c === "\r"){ /* ignore */ }
-      else field += c;
+      if(c === '"'){
+        inQuotes = true;
+      } else if(c === delim){
+        cur.push(field.trim());
+        field = "";
+      } else if(c === "\n"){
+        cur.push(field.trim());
+        rows.push(cur);
+        cur = [];
+        field = "";
+      } else if(c === "\r"){
+        // ignore
+      } else {
+        field += c;
+      }
     }
   }
-  if(field.length || cur.length){ cur.push(field.trim()); rows.push(cur); }
+  if(field.length || cur.length){
+    cur.push(field.trim());
+    rows.push(cur);
+  }
   return rows;
 }
 
@@ -208,7 +252,12 @@ function renderGames(list){
   if(countEl) countEl.textContent = String(filtered.length);
 
   if(!filtered.length){
-    root.innerHTML = `<div class="notice"><b>Ничего не найдено.</b> Попробуй изменить фильтры.</div>`;
+    const err = ROLEHUB_STATUS.gamesError;
+    if(err){
+      root.innerHTML = `<div class="notice"><b>Данные не загрузились.</b> Проверь ссылку SHEET_CSV_URL и формат CSV (заголовки: title,image,price,type).<br><span class="muted">Ошибка: ${escapeHtml(err)}</span></div>`;
+    } else {
+      root.innerHTML = `<div class="notice"><b>Ничего не найдено.</b> Попробуй изменить фильтры.</div>`;
+    }
     return;
   }
 
