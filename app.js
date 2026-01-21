@@ -4,14 +4,11 @@
 // const TG_USERNAME = "...";
 
 function qs(sel){ return document.querySelector(sel); }
-function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
 function esc(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' }[c])); }
-function lower(s){ return String(s||"").trim().toLowerCase(); }
 
 function normalizeImageUrl(raw){
-  let u = String(raw||"").trim();
+  let u = String(raw||'').trim();
   if(!u) return "assets/library.png";
-  // allow "1.png" or "assets/1.png"
   if(!u.includes("://") && !u.startsWith("assets/") && !u.startsWith("/")) u = "assets/" + u;
   return u;
 }
@@ -29,7 +26,7 @@ function parseCSV(text){
       if(c === '"') inQuotes = true;
       else if(c === ","){ cur.push(field.trim()); field=""; }
       else if(c === "\n"){ cur.push(field.trim()); rows.push(cur); cur=[]; field=""; }
-      else if(c === "\r"){ /* ignore */ }
+      else if(c === "\r"){}
       else field += c;
     }
   }
@@ -43,18 +40,17 @@ async function fetchText(url){
   return await r.text();
 }
 
+function lower(s){ return String(s||"").trim().toLowerCase(); }
 function isBeginnerFriendly(levelValue){
   const v = lower(levelValue);
   return v.includes("нович") || v.includes("beginner") || v.includes("0");
 }
-
 function typeLabel(t){
   const v = lower(t);
   if(v.includes("ван")) return "ваншот";
   if(v.includes("парт")) return "партия";
   return (t||"игра").toString();
 }
-
 function pill(cls, text){
   if(!text) return "";
   return `<span class="pill ${cls||""}">${esc(text)}</span>`;
@@ -65,7 +61,6 @@ async function loadGames(){
     const csv = await fetchText(SHEET_CSV_URL);
     const rows = parseCSV(csv).filter(r=>r.some(x=>String(x||"").trim().length));
     if(rows.length < 2) return [];
-
     const header = rows[0].map(h => (h||"").trim().toLowerCase());
     const idx = (name)=>header.indexOf(name);
 
@@ -80,7 +75,7 @@ async function loadGames(){
     const iDuration = idx("duration");
     const iSchedule = idx("schedule");
 
-    if(iTitle === -1) throw new Error("CSV: нет столбца title. Заголовки: title,image,price,type,genre,system,level,duration,schedule");
+    if(iTitle === -1) throw new Error("CSV: не найден столбец title. Нужны заголовки: title,image,price,type (+ genre/system/level/duration/schedule).");
 
     return rows.slice(1).map(r=>({
       title: (r[iTitle]||"").trim(),
@@ -94,8 +89,6 @@ async function loadGames(){
       schedule: iSchedule>=0 ? (r[iSchedule]||"").trim() : "",
     })).filter(g=>g.title);
   }
-
-  // fallback
   const txt = await fetchText("data.json");
   const data = JSON.parse(txt);
   return (Array.isArray(data) ? data : []).map(g=>({
@@ -104,7 +97,7 @@ async function loadGames(){
     system: g.system || "",
     level: g.level || "",
     duration: g.duration || "",
-    schedule: g.schedule || "",
+    schedule: g.schedule || ""
   }));
 }
 
@@ -147,8 +140,7 @@ function renderGames(list){
     const img = normalizeImageUrl(g.image);
     const price = Number(g.price||0) || 0;
     const t = typeLabel(g.type);
-    const signupHref = `form.html?game=${encodeURIComponent(g.title)}`;
-    const detailHref = `game.html?game=${encodeURIComponent(g.title)}`;
+    const href = `form.html?game=${encodeURIComponent(g.title)}`;
 
     const meta = [
       pill("ink","онлайн"),
@@ -163,90 +155,15 @@ function renderGames(list){
 
     return `
       <div class="card">
-        <a class="cardOverlay" href="${detailHref}" aria-label="${esc(g.title)}"></a>
         <img src="${esc(img)}" alt="${esc(g.title)}" onerror="this.onerror=null;this.src='assets/library.png';">
         <div class="c-inner">
           <h3>${esc(g.title)}</h3>
           <div class="meta">${meta}</div>
-          <div class="cardActions">
-            <a class="btn btn-red" href="${signupHref}">Записаться на игру</a>
-          </div>
+          <a class="btn btn-red" href="${href}">Записаться на игру</a>
         </div>
       </div>
     `;
   }).join("");
-}
-
-function wireFilters(list){
-  const qEl = qs("#games_q");
-  const typeEl = qs("#games_type");
-  const begEl = qs("#games_beginner");
-  if(!qEl && !typeEl && !begEl) return;
-  const handler = ()=>renderGames(list);
-  if(qEl) qEl.addEventListener("input", handler);
-  if(typeEl) typeEl.addEventListener("change", handler);
-  if(begEl) begEl.addEventListener("change", handler);
-}
-
-function applyQueryToFilters(){
-  const params = new URLSearchParams(location.search);
-  const beg = params.get("beginner");
-  const begEl = qs("#games_beginner");
-  if(begEl && (beg === "1" || beg === "true")) begEl.checked = true;
-}
-
-function renderNewbies(list){
-  const box = qs("[data-newbies]");
-  if(!box) return;
-  const picks = list.filter(g=>isBeginnerFriendly(g.level)).slice(0,3);
-  if(!picks.length){
-    box.innerHTML = `<div class="small">Пока нет игр с пометкой “новичкам”. Добавь слово <b>новичкам</b> в поле <b>level</b> в таблице.</div>`;
-    return;
-  }
-  box.innerHTML = picks.map(g=>{
-    const href = `game.html?game=${encodeURIComponent(g.title)}`;
-    return `<a class="miniCard" href="${href}">${esc(g.title)}</a>`;
-  }).join("");
-}
-
-const MASTERS = [
-  {
-    name: "Kenzo",
-    title: "Kenzo",
-    photo: "assets/masters/kenzo.jpg",
-    systems: "D&D 5e • CoC • PF2e",
-    style: "Атмосфера • Ролеплей • Драйв",
-    verified: true
-  }
-];
-
-function renderMasters(){
-  const root = qs("[data-masters]");
-  if(!root) return;
-
-  root.innerHTML = MASTERS.map(m=>`
-    <div class="mcard">
-      <div class="mphoto">
-        <img src="${esc(m.photo)}" alt="${esc(m.name)}" onerror="this.onerror=null;this.src='assets/library.png';">
-      </div>
-      <div class="mbody">
-        <div class="mhead">
-          <div>
-            <div class="mname">${esc(m.name)}</div>
-            <div class="small">${esc(m.systems || "")}</div>
-          </div>
-          ${m.verified ? '<div class="mflag">Проверен</div>' : ''}
-        </div>
-        <div class="mmeta">
-          ${m.style ? pill("cyan", m.style) : ""}
-        </div>
-        <div class="actions" style="margin-top:12px">
-          <a class="btn btn-red" href="contacts.html">Написать</a>
-          <a class="btn btn-outline" href="custom.html">Собрать партию</a>
-        </div>
-      </div>
-    </div>
-  `).join("");
 }
 
 async function submitToApi(kind, payload){
@@ -289,93 +206,43 @@ function bindForm(formId, kind){
   });
 }
 
-function renderGameDetail(list){
-  const root = qs("[data-game-detail]");
-  if(!root) return;
-
-  const params = new URLSearchParams(location.search);
-  const gameName = params.get("game") || "";
-  const g = list.find(x => x.title === gameName) || list[0];
-
-  const img = normalizeImageUrl(g.image);
-  const price = Number(g.price||0) || 0;
-  const t = typeLabel(g.type);
-  const signupHref = `form.html?game=${encodeURIComponent(g.title)}`;
-
-  const meta = [
-    pill("ink","онлайн"),
-    pill("red", t),
-    pill("cyan", price ? `${price.toLocaleString('ru-RU')} ₽` : "бесплатно"),
-    pill("", g.system),
-    pill("", g.genre),
-    pill("", g.level),
-    pill("", g.duration ? `⏱ ${g.duration}` : ""),
-    pill("", g.schedule ? `🗓 ${g.schedule}` : ""),
-  ].filter(Boolean).join("");
-
-  root.innerHTML = `
-    <div class="detailHero">
-      <div class="detailImg">
-        <img src="${esc(img)}" alt="${esc(g.title)}" onerror="this.onerror=null;this.src='assets/library.png';">
-      </div>
-      <div class="detailBody">
-        <h1 class="detailTitle">${esc(g.title)}</h1>
-        <div class="meta">${meta}</div>
-        <div class="notice small" style="margin-top:12px">
-          Оставь заявку — мы получим её в Telegram и подтвердим участие.
-        </div>
-        <div class="detailActions">
-          <a class="btn btn-red" href="${signupHref}">Записаться</a>
-          <a class="btn btn-outline" href="games.html">Каталог</a>
-        </div>
-      </div>
-    </div>
-  `;
+function wireFilters(list){
+  const qEl = qs("#games_q");
+  const typeEl = qs("#games_type");
+  const begEl = qs("#games_beginner");
+  if(!qEl && !typeEl && !begEl) return;
+  const handler = ()=>renderGames(list);
+  if(qEl) qEl.addEventListener("input", handler);
+  if(typeEl) typeEl.addEventListener("change", handler);
+  if(begEl) begEl.addEventListener("change", handler);
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
-  // set tg links
-  qsa("[data-tg-link]").forEach(a=>{
-    a.href = "https://t.me/" + TG_USERNAME;
-    a.textContent = "@" + TG_USERNAME;
-    a.target = "_blank";
-    a.rel = "noopener";
-  });
-
   let games = [];
   try{
     games = await loadGames();
-
-    // Games list
-    if(qs("[data-games]")){
-      applyQueryToFilters();
-      renderGames(games);
-      wireFilters(games);
-    }
-
-    // Newbies section
-    renderNewbies(games);
-
-    // Game detail
-    renderGameDetail(games);
-
-    // Masters
-    renderMasters();
+    renderGames(games);
+    wireFilters(games);
   }catch(e){
     console.error(e);
-    const root = qs("[data-games]") || qs("[data-game-detail]") || qs("[data-newbies]");
-    if(root) root.innerHTML = `<div class="notice"><b>Ошибка:</b> ${esc(e.message || e)}</div>`;
+    const root = qs("[data-games]");
+    if(root) root.innerHTML = `<div class="notice"><b>Ошибка загрузки игр:</b> ${esc(e.message || e)}</div>`;
   }
 
-  // prefill game
   const params = new URLSearchParams(location.search);
   const game = params.get("game");
   const gf = document.getElementById("gameField");
   if(gf && game) gf.value = game;
 
-  // forms
   bindForm("signupForm","signup");
   bindForm("customPartyForm","custom_party");
   bindForm("contactForm","contact");
   bindForm("gmApplyForm","gm_apply");
+
+  document.querySelectorAll("[data-tg-link]").forEach(a=>{
+    a.href = "https://t.me/" + TG_USERNAME;
+    a.textContent = "@" + TG_USERNAME;
+    a.target = "_blank";
+    a.rel = "noopener";
+  });
 });

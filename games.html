@@ -17,6 +17,7 @@
     </a>
     <div class="navlinks">
       <a href="games.html">Игры</a>
+      <a href="hire.html">Найти мастера</a>
       <a href="custom.html">Своя партия</a>
       <a href="contacts.html">Контакты</a>
       <a href="legal.html">Соглашение</a>
@@ -32,6 +33,27 @@
   <div class="section-title">
     <h2>Каталог игр</h2>
     <div class="hint">только онлайн • заявки в TG</div>
+  </div>
+
+  
+  <div class="filters">
+    <div class="field-inline">
+      <label>Поиск</label>
+      <input id="games_q" type="text" placeholder="D&D, хоррор, новичкам, 900…">
+    </div>
+    <div class="field-inline">
+      <label>Тип</label>
+      <select id="games_type">
+        <option value="all">Все</option>
+        <option value="партия">Партии</option>
+        <option value="ваншот">Ваншоты</option>
+      </select>
+    </div>
+    <label class="check-inline">
+      <input id="games_beginner" type="checkbox">
+      Новичкам
+    </label>
+    <div class="small" style="margin-left:auto">Найдено: <b data-games-count>—</b></div>
   </div>
 
   <div class="grid" data-games>
