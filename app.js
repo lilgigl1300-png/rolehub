@@ -528,6 +528,10 @@ function bindForm(formId, kind){
 /* ---------------- Boot ---------------- */
 
 document.addEventListener("DOMContentLoaded", async ()=>{
+  const mq = document.getElementById("masters_q");
+  if (mq) mq.value = "";
+  const gq = document.getElementById("games_q");
+  if (gq) gq.value = "";
   const qf = document.getElementById('quizForm');
   if(qf){
     qf.addEventListener('submit', (e)=>{
