@@ -1,20 +1,16 @@
 // === НАСТРОЙКИ (поменяй под себя) ===
-
-// 1) URL на CSV из Google Sheets (опционально).
-// Если оставить пустым — сайт возьмёт игры из локального data.json
 //
-// Как получить CSV:
-// Google Sheets → Файл → Поделиться → Опубликовать в интернете → Лист → CSV
-// Получишь ссылку вида:
-// https://docs.google.com/spreadsheets/d/e/XXXX/pub?output=csv
-//
+// 1) Игры (CSV). Рекомендуемый вариант: прокси через ваш Cloudflare Worker:
+//    https://<worker>.workers.dev/games.csv
 const SHEET_CSV_URL = "https://long-sound-b57c.lilgigl1300.workers.dev/games.csv";
-
-// 2) Endpoint бэкенда, который отправляет заявки в Telegram (обязательно для авто-отправки).
-// Ты создашь его как Cloudflare Worker / Netlify Function (инструкции в README).
-// Пример для Cloudflare Worker:
-// https://rolehub-submit.yourname.workers.dev/submit
+//
+// 2) Мастера (CSV). Если оставить пустым — сайт возьмёт мастеров из masters.json.
+//    Рекомендуемый вариант: прокси через Worker (чтобы не было CORS):
+//    https://<worker>.workers.dev/masters.csv
+const MASTERS_CSV_URL = "";
+//
+// 3) Endpoint для заявок (POST) — ваш Cloudflare Worker
 const SUBMIT_API_URL = "https://long-sound-b57c.lilgigl1300.workers.dev";
-
-// 3) Твой Telegram @username (для ссылки на контакт)
+//
+// 4) Telegram username для ссылок
 const TG_USERNAME = "iwwitich";

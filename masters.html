@@ -35,6 +35,21 @@
     <div class="hint">отбор • отзывы • поддержка</div>
   </div>
 
+  
+  <div class="filters">
+    <div class="field-inline">
+      <label>Поиск</label>
+      <input id="masters_q" type="text" placeholder="Kenzo, D&D, CoC…">
+    </div>
+    <div class="field-inline">
+      <label>Система</label>
+      <select id="masters_system">
+        <option value="all">Все</option>
+      </select>
+    </div>
+    <div class="small" style="margin-left:auto">Найдено: <b data-masters-count>—</b></div>
+  </div>
+
   <div class="mastersGrid" data-masters></div>
 
   <div class="panel" style="margin-top:18px">

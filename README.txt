@@ -94,3 +94,23 @@ title, image, price, type, genre, system, level, duration, schedule
 
 
 Навигация: в шапке вкладка «Мастера» ведёт на masters.html (список). Страница hire.html («Подобрать мастера») доступна кнопкой со страницы мастеров.
+
+
+=== Привязка игр к мастеру ===
+В таблице игр добавь колонку:
+gm
+И для игр мастера Kenzo укажи значение:
+kenzo
+Тогда на странице master.html?name=kenzo появится список его игр.
+
+=== Таблица мастеров (без кода) ===
+Создай отдельный Google Sheet (или отдельный лист) и опубликуй как CSV.
+Заголовки:
+id, name, photo, systems, style, about, verified
+
+Пример строки:
+kenzo, Kenzo, assets/masters/kenzo.jpg, D&D 5e | Call of Cthulhu | Pathfinder 2e, Атмосфера • Ролеплей • Драйв, Провожу игры онлайн…, true
+
+Чтобы подключить CSV мастеров, вставь ссылку в config.js:
+MASTERS_CSV_URL = "https://<ваш-worker>.workers.dev/masters.csv"
+или (если вы решили не использовать прокси) прямую CSV ссылку на Google Sheets.

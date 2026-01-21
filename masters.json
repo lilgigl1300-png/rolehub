@@ -1,0 +1,15 @@
+[
+  {
+    "id": "kenzo",
+    "name": "Kenzo",
+    "photo": "assets/masters/kenzo.jpg",
+    "systems": [
+      "D&D 5e",
+      "Call of Cthulhu",
+      "Pathfinder 2e"
+    ],
+    "style": "Атмосфера • Ролеплей • Драйв",
+    "verified": true,
+    "about": "Провожу игры онлайн, люблю яркие сцены и бережную атмосферу. Подходит новичкам."
+  }
+]
