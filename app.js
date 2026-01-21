@@ -4,8 +4,6 @@
 // const SUBMIT_API_URL = "...";
 // const TG_USERNAME = "...";
 
-
-const ROLEHUB_STATUS = (window.__ROLEHUB_STATUS = window.__ROLEHUB_STATUS || { gamesError:"", mastersError:"", gamesSource:"", mastersSource:"" });
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
 function esc(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' }[c])); }
@@ -18,66 +16,24 @@ function normalizeImageUrl(raw){
   return u;
 }
 
-function detectDelimiterFromHeaderLine(line){
-  // Pick the delimiter that appears most in the first non-empty line.
-  const counts = {
-    ",": (line.split(",").length - 1),
-    ";": (line.split(";").length - 1),
-    "\t": (line.split("\t").length - 1),
-    "|": (line.split("|").length - 1),
-  };
-  let best = ",";
-  for(const d of [";", "\t", "|"]){
-    if(counts[d] > counts[best]) best = d;
-  }
-  return best;
-}
-
 function parseCSV(text){
-  // Robust CSV parser with auto-delimiter (comma/semicolon/tab/pipe) + quotes.
-  const clean = String(text || "").replace(/^\uFEFF/, "");
-  const firstLine = (clean.split(/\r?\n/).find(l => l.trim().length) || "");
-  const delim = detectDelimiterFromHeaderLine(firstLine);
-
   const rows = [];
-  let cur = [];
-  let field = "";
-  let inQuotes = false;
-
-  for(let i=0; i<clean.length; i++){
-    const c = clean[i];
-
+  let cur = [], field = "", inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
     if(inQuotes){
-      if(c === '"' && clean[i+1] === '"'){
-        field += '"';
-        i++;
-      } else if(c === '"'){
-        inQuotes = false;
-      } else {
-        field += c;
-      }
+      if(c === '"' && text[i+1] === '"'){ field += '"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else field += c;
     } else {
-      if(c === '"'){
-        inQuotes = true;
-      } else if(c === delim){
-        cur.push(field.trim());
-        field = "";
-      } else if(c === "\n"){
-        cur.push(field.trim());
-        rows.push(cur);
-        cur = [];
-        field = "";
-      } else if(c === "\r"){
-        // ignore
-      } else {
-        field += c;
-      }
+      if(c === '"') inQuotes = true;
+      else if(c === ","){ cur.push(field.trim()); field=""; }
+      else if(c === "\n"){ cur.push(field.trim()); rows.push(cur); cur=[]; field=""; }
+      else if(c === "\r"){ /* ignore */ }
+      else field += c;
     }
   }
-  if(field.length || cur.length){
-    cur.push(field.trim());
-    rows.push(cur);
-  }
+  if(field.length || cur.length){ cur.push(field.trim()); rows.push(cur); }
   return rows;
 }
 
@@ -135,7 +91,16 @@ async function loadGames(){
     const iLevel = idx("level");
     const iDuration = idx("duration");
     const iSchedule = idx("schedule");
-    const iGm = idx("gm"); // NEW: master id, e.g. kenzo
+    const iGm = idx("gm");
+    const iId = idx("id");
+    const iSubtitle = idx("subtitle");
+    const iPitch = idx("pitch");
+    const iPlatform = idx("platform");
+    const iContent = idx("content");
+    const iSafety = idx("safety");
+    const iSeats = idx("seats");
+    const iForWhom = idx("forwhom");
+    const iHow = idx("how");
 
     if(iTitle === -1) throw new Error("CSV игр: нет столбца title. Минимум: title,image,price,type (+ genre/system/level/duration/schedule/gm).");
 
@@ -149,7 +114,16 @@ async function loadGames(){
       level: iLevel>=0 ? (r[iLevel]||"").trim() : "",
       duration: iDuration>=0 ? (r[iDuration]||"").trim() : "",
       schedule: iSchedule>=0 ? (r[iSchedule]||"").trim() : "",
-      gm: iGm>=0 ? (r[iGm]||"").trim() : ""
+      gm: iGm>=0 ? (r[iGm]||"").trim() : "",
+      id: iId>=0 ? (r[iId]||"").trim() : "",
+      subtitle: iSubtitle>=0 ? (r[iSubtitle]||"").trim() : "",
+      pitch: iPitch>=0 ? (r[iPitch]||"").trim() : "",
+      platform: iPlatform>=0 ? (r[iPlatform]||"").trim() : "",
+      content: iContent>=0 ? (r[iContent]||"").trim() : "",
+      safety: iSafety>=0 ? (r[iSafety]||"").trim() : "",
+      seats: iSeats>=0 ? (r[iSeats]||"").trim() : "",
+      forwhom: iForWhom>=0 ? (r[iForWhom]||"").trim() : "",
+      how: iHow>=0 ? (r[iHow]||"").trim() : ""
     })).filter(g=>g.title);
   }
 
@@ -212,6 +186,18 @@ async function loadMasters(){
   }
 }
 
+
+function getUrlGameFilters(){
+  const p = new URLSearchParams(location.search);
+  return {
+    type: (p.get("type")||"").toLowerCase(),
+    system: (p.get("system")||"").toLowerCase(),
+    genre: (p.get("genre")||"").toLowerCase(),
+    level: (p.get("level")||"").toLowerCase(),
+    duration: (p.get("duration")||"").toLowerCase(),
+  };
+}
+
 /* ---------------- UI: Games list ---------------- */
 
 function applyQueryToFilters(){
@@ -230,6 +216,14 @@ function renderGames(list){
   const begEl = qs("#games_beginner");
 
   let filtered = list.slice();
+
+  const urlF = getUrlGameFilters();
+  if(urlF.type){ filtered = filtered.filter(g=> lower(g.type).includes(urlF.type)); }
+  if(urlF.system){ filtered = filtered.filter(g=> lower(g.system).includes(urlF.system)); }
+  if(urlF.genre){ filtered = filtered.filter(g=> lower(g.genre).includes(urlF.genre)); }
+  if(urlF.level){ filtered = filtered.filter(g=> lower(g.level).includes(urlF.level)); }
+  if(urlF.duration){ filtered = filtered.filter(g=> lower(g.duration).includes(urlF.duration)); }
+
 
   const q = qEl ? lower(qEl.value) : "";
   if(q){
@@ -252,12 +246,7 @@ function renderGames(list){
   if(countEl) countEl.textContent = String(filtered.length);
 
   if(!filtered.length){
-    const err = ROLEHUB_STATUS.gamesError;
-    if(err){
-      root.innerHTML = `<div class="notice"><b>Данные не загрузились.</b> Проверь ссылку SHEET_CSV_URL и формат CSV (заголовки: title,image,price,type).<br><span class="muted">Ошибка: ${escapeHtml(err)}</span></div>`;
-    } else {
-      root.innerHTML = `<div class="notice"><b>Ничего не найдено.</b> Попробуй изменить фильтры.</div>`;
-    }
+    root.innerHTML = `<div class="notice"><b>Ничего не найдено.</b> Попробуй изменить фильтры.</div>`;
     return;
   }
 
@@ -431,7 +420,16 @@ function renderGameDetail(games){
     pill("", g.level),
     pill("", g.duration ? `⏱ ${g.duration}` : ""),
     pill("", g.schedule ? `🗓 ${g.schedule}` : ""),
+    pill("", g.platform ? `🎧 ${g.platform}` : ""),
+    pill("", g.seats ? `👥 ${g.seats}` : ""),
   ].filter(Boolean).join("");
+
+  const pitch = g.pitch || "Короткое описание скоро появится. Пока можно записаться — мы уточним детали в Telegram.";
+  const forWhom = g.forwhom || "Подходит новичкам и опытным игрокам — мастер поможет войти в игру.";
+  const how = g.how || `Онлайн-сессия. Связь через ${g.platform || "Discord"}. Длительность: ${g.duration || "3–4 часа"}.`;
+
+  const safetyTools = g.safety || "X-Card, Lines & Veils, пауза по запросу";
+  const contentTags = g.content || "без тяжёлых тем (если есть — мастер предупредит)";
 
   root.innerHTML = `
     <div class="detailHero">
@@ -440,85 +438,52 @@ function renderGameDetail(games){
       </div>
       <div class="detailBody">
         <h1 class="detailTitle">${esc(g.title)}</h1>
+        ${g.subtitle ? `<div class="small" style="margin:-6px 0 10px; font-weight:650">${esc(g.subtitle)}</div>` : ""}
         <div class="meta">${meta}</div>
-        <div class="notice small" style="margin-top:12px">
-          Оставь заявку — мы получим её в Telegram и подтвердим участие.
-        </div>
+
         <div class="detailActions">
           <a class="btn btn-red" href="${signupHref}">Записаться</a>
           <a class="btn btn-outline" href="games.html">Каталог</a>
         </div>
-      </div>
-    </div>
-  `;
-}
 
-function renderMasterDetail(masters, games){
-  const root = qs("[data-master-detail]");
-  if(!root) return;
-
-  const params = new URLSearchParams(location.search);
-  const id = params.get("name") || "";
-  const m = masters.find(x=>x.id === id) || masters[0];
-
-  if(!m){
-    root.innerHTML = `<div class="notice">Мастер не найден.</div>`;
-    return;
-  }
-
-  document.title = `Мастер ${m.name} — RoleHub`;
-
-  const photo = normalizeImageUrl(m.photo);
-  const meta = [
-    pill("ink", "онлайн"),
-    m.verified ? pill("red", "проверен") : "",
-    pill("", (m.systems||[]).join(" • ")),
-    pill("cyan", m.style || "")
-  ].filter(Boolean).join("");
-
-  // games by master (gm column)
-  const myGames = (games || []).filter(g => lower(g.gm) === lower(m.id));
-  const gamesHtml = myGames.length ? `
-    <div class="section-title" style="margin-top:18px">
-      <h2>Игры мастера</h2>
-      <div class="hint">из каталога</div>
-    </div>
-    <div class="grid">
-      ${myGames.map(g=>{
-        const href = `game.html?game=${encodeURIComponent(g.title)}`;
-        return `<a class="miniCard" href="${href}">${esc(g.title)}</a>`;
-      }).join("")}
-    </div>
-  ` : `
-    <div class="notice small" style="margin-top:12px">
-      Игры мастера пока не привязаны. Добавь в таблицу игр колонку <b>gm</b> и укажи для нужных игр значение <b>${esc(m.id)}</b>.
-    </div>
-  `;
-
-  root.innerHTML = `
-    <div class="masterHero">
-      <div>
-        <img src="${esc(photo)}" alt="${esc(m.name)}" onerror="this.onerror=null;this.src='assets/library.png';">
-      </div>
-      <div>
-        <h1 class="masterName">${esc(m.name)}</h1>
-        <div class="meta">${meta}</div>
-        <div class="notice small" style="margin-top:12px">
-          Чтобы записаться на игру с мастером или подобрать партию — оставь заявку, мы свяжемся в Telegram.
+        <div class="panel" style="margin-top:14px">
+          <div class="p-inner">
+            <div class="kicker"><span class="dot"></span>о чём игра</div>
+            <p class="lead">${esc(pitch)}</p>
+          </div>
         </div>
-        <div class="masterAbout small">${esc(m.about || "")}</div>
-        <div class="detailActions" style="margin-top:14px">
-          <a class="btn btn-red" href="contacts.html">Написать</a>
-          <a class="btn btn-ink" href="custom.html">Собрать партию</a>
-          <a class="btn btn-outline" href="games.html">Каталог игр</a>
+
+        <div class="panel" style="margin-top:14px">
+          <div class="p-inner">
+            <div class="kicker"><span class="dot"></span>кому подойдёт</div>
+            <p class="lead">${esc(forWhom)}</p>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:14px">
+          <div class="p-inner">
+            <div class="kicker"><span class="dot"></span>как проходит</div>
+            <p class="lead">${esc(how)}</p>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:14px">
+          <div class="p-inner">
+            <div class="kicker"><span class="dot"></span>политика комфорта</div>
+            <p class="lead">Мы играем уважительно и без токсичности. Перед игрой согласуем границы, а на сессии можно сделать паузу в любой момент.</p>
+            <ul class="list">
+              <li><b>Инструменты безопасности:</b> ${esc(safetyTools)}</li>
+              <li><b>Контент-теги:</b> ${esc(contentTags)}</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-    ${gamesHtml}
   `;
 }
 
 /* ---------------- Forms ---------------- */
+
 
 async function submitToApi(kind, payload){
   if(!SUBMIT_API_URL) throw new Error("SUBMIT_API_URL не настроен (см. config.js)");
@@ -563,6 +528,21 @@ function bindForm(formId, kind){
 /* ---------------- Boot ---------------- */
 
 document.addEventListener("DOMContentLoaded", async ()=>{
+  const qf = document.getElementById('quizForm');
+  if(qf){
+    qf.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const fd = new FormData(qf);
+      const p = new URLSearchParams();
+      for(const [k,v] of fd.entries()){
+        if(String(v||'').trim()) p.set(k, String(v).trim());
+      }
+      // Квиз всегда подразумевает новичкам, если выбран level
+      const url = 'games.html?' + p.toString();
+      location.href = url;
+    });
+  }
+
   qsa("[data-tg-link]").forEach(a=>{
     a.href = "https://t.me/" + TG_USERNAME;
     a.textContent = "@" + TG_USERNAME;

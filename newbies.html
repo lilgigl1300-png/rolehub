@@ -1,0 +1,82 @@
+<!doctype html><html lang="ru"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;650;800;900;1000&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<title>Новичкам — квиз — RoleHub</title>
+</head>
+<body class="bg-grid">
+<div class="header">
+  <div class="nav">
+    <a class="brand" href="index.html">
+      <span class="mark"></span>
+      <span class="name">RoleHub</span>
+      <span class="tag">онлайн НРИ</span>
+    </a>
+    <div class="navlinks">
+      <a href="games.html">Игры</a>
+      <a href="masters.html">Мастера</a>
+      <a href="newbies.html">Новичкам</a>
+      <a href="custom.html">Своя партия</a>
+      <a href="contacts.html">Контакты</a>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="shape red"></div>
+  <div class="shape cyan"></div>
+  
+<div class="section-title"><h2>Новичкам</h2><div class="hint">подбор игры за 30 секунд</div></div>
+<div class="panel"><div class="p-inner">
+<form id="quizForm" class="quiz">
+  <div class="field">
+    <label>Что хочется?</label>
+    <select name="genre">
+      <option value="">Не знаю</option>
+      <option value="приключение">Приключение</option>
+      <option value="детектив">Детектив</option>
+      <option value="хоррор">Хоррор</option>
+      <option value="политика">Политика/интриги</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Сколько по времени?</label>
+    <select name="duration">
+      <option value="">Не важно</option>
+      <option value="2-3">2–3 часа</option>
+      <option value="3-4">3–4 часа</option>
+      <option value="4+">4+ часов</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Уровень</label>
+    <select name="level">
+      <option value="новичкам">Новичкам</option>
+      <option value="">Любой</option>
+      <option value="опытным">Опытным</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Система</label>
+    <select name="system">
+      <option value="">Любая</option>
+      <option value="D&D">D&D</option>
+      <option value="Call of Cthulhu">Call of Cthulhu</option>
+      <option value="Pathfinder">Pathfinder</option>
+    </select>
+  </div>
+  <div class="actions" style="margin-top:14px">
+    <button class="btn btn-red" type="submit">Показать подбор</button>
+    <a class="btn btn-outline" href="hire.html">Подобрать мастера</a>
+  </div>
+</form>
+<p class="small" style="margin-top:10px">Подбор откроется в каталоге с уже включёнными фильтрами.</p>
+</div></div>
+
+</div>
+<footer>Платформа предоставляет информационные услуги. Оплата и проведение игр осуществляется напрямую между мастером и игроками. Администрация не является стороной сделки.</footer>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body></html>
