@@ -5,9 +5,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;650;800;900;1000&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<title>Игры — RoleHub</title></head>
+<title>Мастера — RoleHub</title>
+</head>
 <body class="bg-grid">
-
 <div class="header">
   <div class="nav">
     <a class="brand" href="index.html">
@@ -31,43 +31,19 @@
   <div class="shape cyan"></div>
 
   <div class="section-title">
-    <h2>Каталог игр</h2>
-    <div class="hint">только онлайн • заявки в TG</div>
+    <h2>Проверенные мастера</h2>
+    <div class="hint">отбор • отзывы • поддержка</div>
   </div>
 
-  
-  <div class="filters">
-    <div class="field-inline">
-      <label>Поиск</label>
-      <input id="games_q" type="text" placeholder="D&D, хоррор, новичкам, 900…">
-    </div>
-    <div class="field-inline">
-      <label>Тип</label>
-      <select id="games_type">
-        <option value="all">Все</option>
-        <option value="партия">Партии</option>
-        <option value="ваншот">Ваншоты</option>
-      </select>
-    </div>
-    <label class="check-inline">
-      <input id="games_beginner" type="checkbox">
-      Новичкам
-    </label>
-    <div class="small" style="margin-left:auto">Найдено: <b data-games-count>—</b></div>
-  </div>
-
-  <div class="grid" data-games>
-    <div class="card"><div class="c-inner"><span class="spinner"></span> <span class="small">Загружаем список…</span></div></div>
-  </div>
+  <div class="mastersGrid" data-masters></div>
 
   <div class="panel" style="margin-top:18px">
     <div class="p-inner">
-      <div class="kicker"><span class="dot"></span>не нашла подходящую?</div>
-      <div class="h1" style="font-size: clamp(26px, 3.2vw, 40px); margin-top:12px">Соберём игру под твой запрос</div>
-      <p class="lead" style="margin-bottom:14px">Оставь заявку — подберём мастера и предложим варианты (онлайн).</p>
+      <div class="kicker"><span class="dot"></span>хочешь мастера под запрос?</div>
+      <p class="lead">Опиши систему, жанр и удобное время — мы подберём мастера и предложим варианты.</p>
       <div class="actions">
-        <a class="btn btn-ink" href="custom.html">Оставить заявку</a>
-        <a class="btn btn-outline" href="contacts.html">Задать вопрос</a>
+        <a class="btn btn-ink" href="hire.html">Найти мастера</a>
+        <a class="btn btn-outline" href="custom.html">Собрать свою партию</a>
       </div>
     </div>
   </div>
