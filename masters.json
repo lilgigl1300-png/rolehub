@@ -4,12 +4,14 @@
     "name": "Kenzo",
     "photo": "assets/masters/kenzo.jpg",
     "systems": [
-      "D&D 5e",
+      "DnD 5e (2014)",
       "Call of Cthulhu",
-      "Pathfinder 2e"
+      "Cyberpunk 2020",
+      "Cyberpunk RED",
+      "Fate core"
     ],
     "style": "Атмосфера • Ролеплей • Драйв",
-    "verified": true,
-    "about": "Провожу игры онлайн, люблю яркие сцены и бережную атмосферу. Подходит новичкам."
+    "about": "Провожу игры онлайн. Люблю яркие сцены и бережную атмосферу. Подходит новичкам.",
+    "verified": true
   }
 ]
