@@ -1,4 +1,4 @@
-// Robust front-end for RoleHub (v12 fix)
+// Robust front-end for Dice&Soul (v12 fix)
 
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
